@@ -15,9 +15,9 @@ import javafx.stage.Stage
 fun m(num: Int) = num * Config.pixelSize.toDouble()
 
 object Config {
-    val w = m(100)
-    val h = m(100)
-    const val pixelSize = 6
+    val w = m(500)
+    val h = m(500)
+    const val pixelSize = 1
 }
 
 

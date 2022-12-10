@@ -6,7 +6,7 @@ package bekyiu
  * @Created by bekyiu
  */
 
-class Color(
+data class Color(
     var r: Double,
     var g: Double,
     var b: Double,
@@ -16,6 +16,10 @@ class Color(
 
     companion object {
         fun white() = Color(255, 255, 255)
+        fun black() = Color(0, 0, 0)
+        fun red() = Color(255, 0, 0)
+        fun green() = Color(0, 255, 0)
+        fun blue() = Color(0, 0, 255)
     }
 
     fun addLightIntensity(li: Double) {

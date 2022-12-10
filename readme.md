@@ -1,7 +1,11 @@
 # 3D Renderer
 
-## show
-![](./screenshots/img.png)
+## screenshots
+
+#### triangle
+![](./screenshots/triangle.png)
+
+#### todo
 
 ## run
 ```shell

@@ -4,7 +4,7 @@ package bekyiu
  * @Date 2022/12/10 6:09 PM
  * @Created by bekyiu
  */
-class Vertex(
+data class Vertex(
     var position: Vector,
     var normal: Vector,
     var u: Double,
