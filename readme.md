@@ -5,6 +5,9 @@
 #### triangle
 ![](./screenshots/triangle.png)
 
+### cube
+![](./screenshots/cube.png)
+
 #### todo
 
 ## run

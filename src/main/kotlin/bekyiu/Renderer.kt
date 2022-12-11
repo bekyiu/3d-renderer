@@ -13,21 +13,29 @@ class Renderer(
 ) {
     private val context = canvas.graphicsContext2D
 
-    fun render() {
-        val v1 = Vertex(Vector(200, 50, 10), Vector.zero(), 0.0, 0.0, Color.red())
-        val v2 = Vertex(Vector(50, 200, 10), Vector.zero(), 0.0, 0.0, Color.blue())
-        val v3 = Vertex(Vector(400, 400, 10), Vector.zero(), 0.0, 0.0, Color.green())
+    private val mesh: Mesh
 
-        drawTriangle(v1, v2, v3)
+    private val image: Image
+    init {
+        image = Image("apple.image", this)
+        mesh = Mesh("cube.3d", this)
+    }
+
+    fun render() {
+        // image.draw()
+        mesh.draw()
+    }
+
+    fun drawPixel(x: Int, y: Int, c: Color) {
+        context.fill = c.toJavaFXColor()
+        context.fillRect(m(x), m(y), m(1), m(1))
     }
 
     private fun drawVertex(v: Vertex) {
         val p = v.position
         val x = p.x.toInt()
         val y = p.y.toInt()
-
-        context.fill = v.color.toJavaFXColor()
-        context.fillRect(m(x), m(y), m(1), m(1))
+        drawPixel(x, y, v.color)
     }
 
     private fun drawLine(v1: Vertex, v2: Vertex) {
@@ -92,7 +100,7 @@ class Renderer(
         }
     }
 
-    private fun drawTriangle(v1: Vertex, v2: Vertex, v3: Vertex) {
+    fun drawTriangle(v1: Vertex, v2: Vertex, v3: Vertex) {
         // y值从小到大排序
         val vArr = arrayOf(v1, v2, v3).sortedBy { it.position.y }
 
