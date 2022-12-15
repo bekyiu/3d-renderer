@@ -16,9 +16,12 @@ class Renderer(
     private val mesh: Mesh
 
     private val image: Image
+
+    private val zbuffer: Array<Array<Double?>>
     init {
         image = Image("apple.image", this)
         mesh = Mesh("cube.3d", this)
+        zbuffer = Array(Config.h.toInt()) { arrayOfNulls(Config.w.toInt()) }
     }
 
     fun render() {
@@ -26,16 +29,22 @@ class Renderer(
         mesh.draw()
     }
 
-    fun drawPixel(x: Int, y: Int, c: Color) {
-        context.fill = c.toJavaFXColor()
-        context.fillRect(m(x), m(y), m(1), m(1))
+    fun drawPixel(x: Int, y: Int, z: Double, c: Color) {
+        val depth = zbuffer[y][x]
+        // z越小离屏幕越近
+        if (depth == null || z < depth) {
+            context.fill = c.toJavaFXColor()
+            context.fillRect(m(x), m(y), m(1), m(1))
+            zbuffer[y][x] = z
+        }
     }
 
     private fun drawVertex(v: Vertex) {
         val p = v.position
         val x = p.x.toInt()
         val y = p.y.toInt()
-        drawPixel(x, y, v.color)
+        val z = p.z
+        drawPixel(x, y, z, v.color)
     }
 
     private fun drawLine(v1: Vertex, v2: Vertex) {

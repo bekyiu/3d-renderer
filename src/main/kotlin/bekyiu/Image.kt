@@ -77,7 +77,7 @@ class Image(
         for (y in 0 until h) {
             for (x in 0 until w) {
                 val c = pixels[y][x]
-                renderer.drawPixel(x, y, c)
+                renderer.drawPixel(x, y, 0.0, c)
             }
         }
     }
