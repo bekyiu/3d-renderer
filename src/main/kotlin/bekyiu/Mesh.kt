@@ -1,7 +1,6 @@
 package bekyiu
 
 import java.io.InputStreamReader
-import java.util.Arrays
 
 /**
  * @Date 2022/12/11 12:28 PM
@@ -15,12 +14,16 @@ class Mesh(
     // indexes[i] 存储一个三角形三个顶点的索引
     val indexes: Array<Array<Int>>
 
+    val position: Vector = Vector(0, 0, 0)
+    val rotation: Vector = Vector(-2.0, 0.0, 0.0)
+    val scale: Vector = Vector(10, 10, 10)
+
     init {
         val inStream = Thread.currentThread().contextClassLoader.getResourceAsStream(path)!!
         val reader = InputStreamReader(inStream)
         val lines = reader.readLines()
         assert(lines[0] == "3d") { "error 3d format" }
-        assert(lines[1] == "1.0") { "error 3d version" }
+        assert(lines[1] == "version 1.1") { "error 3d version" }
 
         vertexes = parseVertexes(lines)
         indexes = parseIndexes(lines)
@@ -33,15 +36,13 @@ class Mesh(
         for (i in 0 until numOfVtx) {
             val line = lines[i + 4]
             val vtx = line.split(" ")
+
             val pos = Vector(vtx[0].toDouble(), vtx[1].toDouble(), vtx[2].toDouble())
-            // todo normal
-            val normal = Vector(0, 0, 0)
-            // todo uv
-            val u = 0.0
-            val v = 0.0
-            // todo color
-            val c = Color(vtx[3].toDouble(), vtx[4].toDouble(), vtx[5].toDouble(), vtx[6].toDouble() / 255)
-            vertexes[i] = Vertex(pos, normal, u, v, c)
+            val normal = Vector(vtx[3].toDouble(), vtx[4].toDouble(), vtx[5].toDouble())
+            val u = vtx[6].toDouble()
+            val v = vtx[7].toDouble()
+
+            vertexes[i] = Vertex(pos, normal, u, v)
         }
         return vertexes.map { it!! }.toTypedArray()
     }

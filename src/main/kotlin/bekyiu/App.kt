@@ -4,7 +4,6 @@ import javafx.application.Application
 import javafx.scene.Scene
 import javafx.scene.canvas.Canvas
 import javafx.scene.layout.AnchorPane
-import javafx.scene.paint.Color
 import javafx.stage.Stage
 
 /**
@@ -24,17 +23,15 @@ object Config {
 class App : Application() {
     override fun start(stage: Stage) {
         val canvas = Canvas(Config.w, Config.h)
-        val context = canvas.graphicsContext2D
         val pane = AnchorPane(canvas)
         val scene = Scene(pane)
 
         stage.scene = scene
         stage.title = "Renderer"
 
-        context.fill = Color.BLACK
-        context.fillRect(0.0, 0.0, Config.w, Config.h)
-
-        Renderer(canvas).render()
+        val r = Renderer(canvas)
+        r.clearCanvas()
+        r.render()
 
         stage.show()
     }

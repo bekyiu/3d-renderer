@@ -1,5 +1,6 @@
 package bekyiu
 
+import javafx.animation.AnimationTimer
 import javafx.scene.canvas.Canvas
 import kotlin.math.abs
 import kotlin.math.floor
@@ -18,15 +19,46 @@ class Renderer(
     private val image: Image
 
     private val zbuffer: Array<Array<Double?>>
+
+    private val camera: Camera = Camera()
+
     init {
         image = Image("apple.image", this)
-        mesh = Mesh("cube.3d", this)
+        mesh = Mesh("apple.3d", this)
         zbuffer = Array(Config.h.toInt()) { arrayOfNulls(Config.w.toInt()) }
     }
 
+    private fun clearZbuffer() {
+        for (arr in zbuffer) {
+            for (i in arr.indices) {
+                arr[i] = null
+            }
+        }
+    }
+
+    fun clearCanvas() {
+        context.fill = javafx.scene.paint.Color.BLACK
+        context.fillRect(0.0, 0.0, Config.w, Config.h)
+    }
+
     fun render() {
-        // image.draw()
-        mesh.draw()
+        var lastTime = System.nanoTime()
+        val gap = 1000000000 / 60.0
+
+        val timer = object : AnimationTimer() {
+            override fun handle(now: Long) {
+                if (now - lastTime < gap) {
+                    return
+                }
+                lastTime = now
+
+                clearZbuffer()
+                clearCanvas()
+                mesh.rotation.x += 0.03
+                drawMesh()
+            }
+        }
+        timer.start()
     }
 
     fun drawPixel(x: Int, y: Int, z: Double, c: Color) {
@@ -44,7 +76,9 @@ class Renderer(
         val x = p.x.toInt()
         val y = p.y.toInt()
         val z = p.z
-        drawPixel(x, y, z, v.color)
+        // todo
+        val c = image.getColorByUV(v.u, v.v)
+        drawPixel(x, y, z, c)
     }
 
     private fun drawLine(v1: Vertex, v2: Vertex) {
@@ -96,7 +130,7 @@ class Renderer(
         val c = vArr[2]
 
 
-        for (y in y1 .. y3) {
+        for (y in y1..y3) {
             val stepped = (y - y1).toDouble()
             val total = (y3 - y1).toDouble()
 
@@ -142,11 +176,45 @@ class Renderer(
         drawTriangle(a, b, m, Forward.UP)
         drawTriangle(b, m, c, Forward.DOWN)
     }
+
+    fun drawMesh() {
+        val model = Matrix.scale(mesh.scale) * Matrix.rotation(mesh.rotation) * Matrix.translation(mesh.position)
+        val view = Matrix.view(camera.position, camera.target, camera.up)
+        val projection = Matrix.perspectiveProjection(0.8, Config.w / Config.h, 0.1, 1.0)
+
+        val mvp = model * view * projection
+
+        for (idx in mesh.indexes) {
+            var v1 = mesh.vertexes[idx[0]]
+            var v2 = mesh.vertexes[idx[1]]
+            var v3 = mesh.vertexes[idx[2]]
+
+            v1 = project(v1, mvp)
+            v2 = project(v2, mvp)
+            v3 = project(v3, mvp)
+
+            drawTriangle(v1, v2, v3)
+        }
+    }
+
+    fun project(vtx: Vertex, mvp: Matrix): Vertex {
+        val w = Config.w
+        val h = Config.h
+        val w2 = w / 2
+        val h2 = h / 2
+
+        val point = mvp.transform(vtx.position)
+        point.x = point.x * w2 + w2
+        point.y = -point.y * h2 + h2
+
+        return Vertex(point, vtx.normal, vtx.u, vtx.v)
+    }
 }
 
 enum class Forward {
     UP, DOWN
 }
+
 /*
 x 每次步进1, 对应的y 和 z
 var y = y1 + (x - x1) * k
